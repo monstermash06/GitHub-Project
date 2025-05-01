@@ -1,43 +1,42 @@
-import javafx.scene.paint.*;
-import javafx.scene.canvas.*;
+import javafx.scene.canvas.GraphicsContext;
 
-public abstract class DrawableObject
-{
-   public DrawableObject(float x, float y)
-   {
-      this.x = x;
-      this.y = y;
-   }
+public abstract class DrawableObject {
+    protected double x, y;
 
-   //positions
-   private float x;
-   private float y;
-   
-   //takes the position of the player and calls draw me with appropriate positions
-   public void draw(float playerx, float playery, GraphicsContext gc, boolean isPlayer)
-   {
-      //the 300,300 places the player at 300,300, if you want to change it you will have to modify it here
-      
-      if(isPlayer)
-         drawMe(playerx,playery,gc);
-      else
-         drawMe(-playerx+300+x,-playery+300+y,gc);
-   }
-   
-   //this method you implement for each object you want to draw. Act as if the thing you want to draw is at x,y.
-   //NOTE: DO NOT CALL DRAWME YOURSELF. Let the the "draw" method do it for you. I take care of the math in that method for a reason.
-   public abstract void drawMe(float x, float y, GraphicsContext gc);
-   public void act()
-   {
-   }
-   
-   public float getX(){return x;}
-   public float getY(){return y;}
-   public void setX(float x_){x = x_;}
-   public void setY(float y_){y = y_;}
-   
-   public double distance(DrawableObject other)
-   {
-      return (Math.sqrt((other.x-x)*(other.x-x) +  (other.y-y)*(other.y-y)   ));
-   }
+    public DrawableObject(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public static void drawBackground(GraphicsContext gc, double offsetX, double offsetY) {
+        gc.setFill(javafx.scene.paint.Color.DARKSLATEGRAY);
+        gc.fillRect(0, 0, 800, 600);
+
+        for (int x = -1; x < 10; x++) {
+            for (int y = -1; y < 8; y++) {
+                gc.setFill((x + y) % 2 == 0 ? javafx.scene.paint.Color.DIMGRAY : javafx.scene.paint.Color.GRAY);
+                gc.fillRect(x * 100 - offsetX % 100, y * 100 - offsetY % 100, 100, 100);
+            }
+        }
+    }
+
+    public static double distance(double x1, double y1, double x2, double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public void draw(GraphicsContext gc, double offsetX, double offsetY) {
+        drawMe(gc, offsetX, offsetY);
+    }
+
+    public abstract void drawMe(GraphicsContext gc, double offsetX, double offsetY);
 }
