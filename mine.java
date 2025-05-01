@@ -2,30 +2,34 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Mine extends DrawableObject {
-
-    private double redness = Math.random() * Math.PI * 2; // starting phase for oscillation
-    private double radius = 6;
+    private double phase = Math.random() * Math.PI * 2;
 
     public Mine(double x, double y) {
-        this.setX(x);
-        this.setY(y);
+        super(x, y);
     }
 
     public void act() {
-        redness += 0.05; // update oscillation
-        if (redness > Math.PI * 2) {
-            redness -= Math.PI * 2;
-        }
+        phase += 0.1;
+    }
+
+    public double distance(Player p) {
+        return DrawableObject.distance(this.x, this.y, p.getX(), p.getY());
     }
 
     
-    public void drawMe(GraphicsContext gc) {
-        double interp = (Math.sin(redness) + 1) / 2; // oscillates between 0 and 1
-        Color color = new Color(1, interp, interp, 1); // red to white
-        gc.setFill(color);
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1);
-        gc.fillOval(getX() - radius, getY() - radius, radius * 2, radius * 2);
-        gc.strokeOval(getX() - radius, getY() - radius, radius * 2, radius * 2);
+    public void drawMe(GraphicsContext gc, double offsetX, double offsetY) {
+        double alpha = 0.5 + 0.5 * Math.sin(phase);
+        gc.setFill(new Color(1, 0, 0, alpha));
+        gc.fillOval(this.x - offsetX + 400 - 10, this.y - offsetY + 300 - 10, 20, 20);
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Mine)) return false;
+        Mine other = (Mine) obj;
+        return (int) other.x == (int) this.x && (int) other.y == (int) this.y;
+    }
+
+    public int hashCode() {
+        return ((int) x) * 31 + ((int) y);
     }
 }
