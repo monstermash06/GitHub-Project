@@ -31,10 +31,9 @@ public class Main extends Application {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
-
         Scene scene = new Scene(root);
 
-        // Read high score from file
+        // Read high score
         try {
             File file = new File(HIGHSCORE_FILE);
             if (file.exists()) {
@@ -51,11 +50,11 @@ public class Main extends Application {
         scene.setOnKeyPressed(e -> keys.add(e.getCode()));
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
-        thePlayer = new Player(300, 300);
+        thePlayer = new Player();
         objects.add(thePlayer);
 
         new AnimationTimer() {
-            public void handle(long currentNanoTime) {
+            public void handle(long now) {
                 if (!gameRunning) return;
 
                 // Background
@@ -64,10 +63,10 @@ public class Main extends Application {
                 // Player logic
                 thePlayer.act(keys);
 
-                // Score calculation
+                // Score
                 score = (int) thePlayer.distanceFromStart();
 
-                // Spawn mines in surrounding grid cells
+                // Spawn mines
                 int cgridx = ((int) thePlayer.getX()) / 100;
                 int cgridy = ((int) thePlayer.getY()) / 100;
 
@@ -90,15 +89,11 @@ public class Main extends Application {
                     }
                 }
 
-                // Remove mines too far away
                 mines.removeIf(m -> m.distance(thePlayer) > 800);
 
-                // Check for collisions
                 for (Mine m : mines) {
                     if (m.distance(thePlayer) < 20) {
                         gameRunning = false;
-
-                        // Update high score if beaten
                         if (score > highScore) {
                             highScore = score;
                             try {
@@ -113,18 +108,16 @@ public class Main extends Application {
                     }
                 }
 
-                // Draw all drawable objects
+                // Draw
                 for (DrawableObject obj : objects) {
-                    obj.drawMe(gc);
+                    obj.draw(gc, thePlayer.getX(), thePlayer.getY());
                 }
 
-                // Draw mines
                 for (Mine m : mines) {
                     m.act();
-                    m.drawMe(gc);
+                    m.draw(gc, thePlayer.getX(), thePlayer.getY());
                 }
 
-                // Draw score
                 gc.setFill(Color.WHITE);
                 gc.fillText("Score: " + score, 20, 20);
                 gc.fillText("High Score: " + highScore, 20, 40);
